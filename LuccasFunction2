@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct  2 16:47:12 2019
+
+@author: lucca
+PROJET 29 - PART DU TRAITEMENT D'IMAGERIE
+"""
+
+
+import cv2.cv2 as cv
+import numpy as np
+from matplotlib import pyplot as plt
+
+
+def noise_removal(img):              #Removing noise with mean and median filter
+    imf = cv.medianBlur(img, 3)
+    imf = cv.GaussianBlur(img,(3,3),cv.BORDER_DEFAULT)
+    return imf
+
+
+def clahe_img(img):
+    clahe = cv.createCLAHE(clipLimit=3, tileGridSize=(8, 8))  # CLAHE APPLICATION
+    imc = clahe.apply(img)
+    return imc
+
+
+def segmentation_img(img):                               #SEGMENTATION OF IMAGE
+    Z = img.reshape((-1, 1))  # reshape into 1D VECTOR
+    Z = np.float32(Z)
+    print(img.shape)
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+    k = 6
+    _, labels, (centers) = cv.kmeans(Z, k, None, criteria, 10, cv.KMEANS_RANDOM_CENTERS)
+    centers = np.uint8(centers)
+    labels = labels.flatten()
+    res = centers[labels.flatten()]
+    res2 = res.reshape((img.shape))  # return to 2d vector shape image
+
+    return res2;
+
+
+def countour_img(img, img_c):
+    ret, th = cv.threshold(img, 180, 255, cv.THRESH_BINARY)
+    contours, hierarchy = cv.findContours(th, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    img_c = cv.cvtColor(img_c, cv.COLOR_GRAY2RGB)
+    img_c = cv.drawContours(img_c, contours, -1, (255, 0, 0), 3)
+
+    return img_c;
+
+# TO DO: Better arrangement of pics
+def apply_filter(path):
+    img = cv.imread(path, 0)
+    img1 = noise_removal(img)
+    img2 = clahe_img(img1)  # Calling the processing functions
+    img3 = segmentation_img(img2)
+    img4 = countour_img(img3, img2)
+
+    fig = plt.figure(figsize=(12, 16))
+    ax1 = fig.add_subplot(221)
+    ax2 = fig.add_subplot(222)
+    ax3 = fig.add_subplot(223)
+    ax4 = fig.add_subplot(224)  # Plotting the images
+    ax1.imshow(img)
+    ax2.imshow(img2)
+    ax3.imshow(img3)
+    ax4.imshow(img4)
+
+    plt.savefig('mama1.jpg') # to make it accessible for pixmap it has to be jpg (or similar)
+
+
