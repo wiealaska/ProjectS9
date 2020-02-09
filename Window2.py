@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLabel, QGridLayout, QSizePolicy
 from ProjetS9 import apply_filter
+from NN_function import prediction
 
 
 # TO DO: DocStrings
@@ -46,6 +47,9 @@ class Window(QWidget):
         self.button_3 = QPushButton("Edit", self)
         self.button_3.clicked.connect(self.img_treat)
 
+        self.button_4 = QPushButton("Evaluate", self)
+        #self.button_4.clicked.connect(self.img_evaluate)
+
         # Labels
         self.imageLabel = QLabel("Image", self)
         self.imageLabel.setAlignment(Qt.AlignTop)
@@ -57,14 +61,21 @@ class Window(QWidget):
         self.imageLabel_2.setStyleSheet("background-color: white; border: 1px inset grey")
         self.imageLabel_2.setScaledContents(1)
 
+        self.imageLabel_3 = QLabel("Hello word", self)
+        self.imageLabel_3.setAlignment(Qt.AlignHCenter)
+        self.imageLabel_3.setFixedHeight(50)
+        self.imageLabel_3.setStyleSheet("background-color: white; border: 1px inset grey")
+
         # Layout
         grid = QGridLayout()
 
-        grid.addWidget(self.imageLabel, 0, 0, 3, 2)
-        grid.addWidget(self.button_3, 1, 2, 1, 1)
-        grid.addWidget(self.imageLabel_2, 0, 3, 3, 2)
-        grid.addWidget(self.button, 3, 0, 1, 2)
-        grid.addWidget(self.button_2, 3, 3, 1, 2)
+        grid.addWidget(self.imageLabel, 0, 0, 5, 2)
+        grid.addWidget(self.button, 5, 0, 1, 2)
+        grid.addWidget(self.button_3, 2, 2, 1, 1)
+        grid.addWidget(self.button_4, 3, 2, 1, 1, Qt.AlignBottom)
+        grid.addWidget(self.imageLabel_3, 4, 2, 1, 1, Qt.AlignTop)
+        grid.addWidget(self.imageLabel_2, 0, 3, 5, 2)
+        grid.addWidget(self.button_2, 5, 3, 1, 2)
 
         self.setLayout(grid)
 
@@ -109,6 +120,15 @@ class Window(QWidget):
 
         img = cv.imread('mama1.jpg')
         cv.imwrite(fname, img)
+
+    # img_evaluate:
+    def img_evaluate(self):
+        if self.imgPath is None:
+            return
+        if self.imgPath.endswith(('.jpg', '.jpeg', '.png')):
+            self.imageLabel_3.setText(prediction(self.imgPath))
+        else:
+            return
 
     # closeEvent: checks if path exits and remove it
     def closeEvent(self, event):
