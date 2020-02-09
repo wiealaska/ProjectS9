@@ -68,3 +68,7 @@ def apply_filter(path):
     plt.savefig('mama1.jpg') # to make it accessible for pixmap it has to be jpg (or similar)
 
 
+
+
+
+
